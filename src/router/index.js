@@ -3,6 +3,7 @@ import LoginView from '../views/LoginView.vue'
 import HomeView from '../views/HomeView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import EditUserView from '@/views/EditUserView.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -17,14 +18,18 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("authToken");
+router.beforeEach((to) => {
+  const auth = useAuthStore()
 
-  if (to.meta.requiresAuth && !token) {
-    next("/login");
-  } else {
-    next();
+  if (to.meta.requiresAuth && !auth.isAuthenticated) {
+    return '/login'
   }
-});
+
+  if (to.meta.requiresAdmin && !auth.isAdmin) {
+    return '/home'
+  }
+
+  return true
+})
 
 export default router

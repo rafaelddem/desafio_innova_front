@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import { useAuthStore } from '@/stores/auth';
+
 export default {
   name: "LoginView",
   data() {
@@ -53,11 +55,8 @@ export default {
         }
 
         const data = await response.json();
-
-        localStorage.setItem("authToken", data.token);
-        localStorage.setItem("user.id", data.user.id);
-        localStorage.setItem("user.username", data.user.username);
-        localStorage.setItem("user.role", data.user.role);
+        const auth = useAuthStore()
+        auth.login(data.token, data.user.role, data.user.username, data.user.role)
 
         this.$router.push("/home");
       } catch (error) {
