@@ -1,0 +1,189 @@
+<template>
+  <div class="login-page">
+    <div class="login-container">
+      <h1>Cadastrar Usuário</h1>
+      <form @submit.prevent="handleRegister">
+        <div>
+          <label for="username">Nome:</label>
+          <input type="text" v-model="username" required />
+        </div>
+        <div>
+          <label for="email">Email:</label>
+          <input type="email" v-model="email" required />
+        </div>
+        <div>
+          <label for="password">Senha:</label>
+          <input type="password" v-model="password" required />
+        </div>
+        <div>
+          <label for="password_confirmation">Confirmação de Senha:</label>
+          <input type="password" v-model="password_confirmation" required />
+        </div>
+        <div>
+          <label for="hero_id">Personagem:</label>
+          <select v-model="hero_id" required>
+            <option disabled value="">Selecione um personagem</option>
+            <option v-for="item in heroes" :key="item.id" :value="item.id">
+              {{ item.name }}
+            </option>
+          </select>
+        </div>
+        <div>
+          <label for="role">Função:</label>
+          <select v-model="role" required>
+              <option disabled value="">Selecione uma função</option>
+              <option value="admin">Administrador</option>
+              <option value="user">Usuário</option>
+          </select>
+        </div>
+        <button type="submit">Cadastrar</button>
+      </form>
+
+      <button @click="goToLogin" class="register-btn">Login</button>
+
+      <p v-if="successMessage" style="color:green; margin-top:10px;">
+        {{ successMessage }}
+      </p>
+      <p v-if="errorMessage" class="error">
+        {{ errorMessage }}
+      </p>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "RegisterView",
+  data() {
+    return {
+      username: "",
+      email: "",
+      password: "",
+      password_confirmation: "",
+      hero_id: "",
+      heroes: [],
+      role: "",
+      successMessage: "",
+      errorMessage: ""
+    };
+  },
+  async mounted() {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/heroes");
+      if (response.ok) {
+        const data = await response.json();
+        this.heroes = data.heroes;
+      } else {
+        console.error("Erro ao carregar os Heróis");
+      }
+    } catch (error) {
+      console.error("Erro de conexão com API", error);
+    }
+  },
+  methods: {
+    async handleRegister() {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: this.username,
+            email: this.email,
+            password: this.password,
+            password_confirmation: this.password_confirmation,
+            hero_id: this.hero_id,
+            role: this.role
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          if (errorData.message === "Validation Exception" && errorData.errors) {
+              const firstError = Object.values(errorData.errors)[0][0];
+              this.errorMessage = firstError;
+          } else {
+              this.errorMessage = errorData.message || "Erro ao cadastrar.";
+          }
+          return;
+        }
+
+        this.successMessage = "Usuário cadastrado com sucesso!";
+        this.errorMessage = "";
+      } catch (error) {
+        this.errorMessage = "Erro de conexão com o servidor.";
+      }
+    },
+    goToLogin() {
+      this.$router.push("/login");
+    }
+  }
+};
+</script>
+
+<style scoped>
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.login-container {
+  width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.login-container form div {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-container label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.login-container input {
+  height: 15px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.login-container select {
+  height: 40px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.login-container button {
+  width: 100%;
+  padding: 10px;
+}
+
+.register-btn {
+  margin-top: 10px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.register-btn:hover {
+  background-color: #1976d2;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
+  text-align: center;
+}
+</style>
