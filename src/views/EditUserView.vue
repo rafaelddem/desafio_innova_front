@@ -1,23 +1,23 @@
 <template>
   <div class="login-page">
     <div class="login-container">
-      <h1>Cadastrar Usuário</h1>
-      <form @submit.prevent="handleRegister">
+      <h1>Editar Usuário</h1>
+      <form @submit.prevent="handleUpdate">
         <div>
           <label for="username">Nome:</label>
           <input type="text" v-model="username" required />
         </div>
         <div>
           <label for="email">Email:</label>
-          <input type="email" v-model="email" required />
+          <input type="email" v-model="email" disabled />
         </div>
         <div>
           <label for="password">Senha:</label>
-          <input type="password" v-model="password" required />
+          <input type="password" v-model="password" />
         </div>
         <div>
           <label for="password_confirmation">Confirmação de Senha:</label>
-          <input type="password" v-model="password_confirmation" required />
+          <input type="password" v-model="password_confirmation" />
         </div>
         <div>
           <label for="hero_id">Personagem:</label>
@@ -30,16 +30,16 @@
         </div>
         <div>
           <label for="role">Função:</label>
-          <select v-model="role" required>
+          <select v-model="role" disabled>
               <option disabled value="">Selecione uma função</option>
               <option value="admin">Administrador</option>
               <option value="user">Usuário</option>
           </select>
         </div>
-        <button type="submit">Cadastrar</button>
+        <button type="submit">Editar</button>
       </form>
 
-      <button @click="goToLogin" class="register-btn">Login</button>
+      <button @click="goToHome" class="register-btn">Home</button>
 
       <p v-if="successMessage" style="color:green; margin-top:10px;">
         {{ successMessage }}
@@ -53,9 +53,10 @@
 
 <script>
 export default {
-  name: "RegisterView",
+  name: "EditUserView",
   data() {
     return {
+      id: null,
       username: "",
       email: "",
       password: "",
@@ -73,48 +74,71 @@ export default {
       if (response.ok) {
         const data = await response.json();
         this.heroes = data.heroes;
-      } else {
-        console.error("Erro ao carregar os Heróis");
       }
     } catch (error) {
-      console.error("Erro de conexão com API", error);
+      console.error("Erro ao carregar heroes", error);
     }
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/user", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      this.id = data.user.id;
+      this.username = data.user.username;
+      this.email = data.user.email;
+      this.hero_id = data.user.hero_id;
+      this.role = data.user.role;
+    } else {
+      console.error("Erro ao carregar usuário");
+    }
+  } catch (error) {
+    console.error("Erro de conexão com API", error);
+  }
+
   },
   methods: {
-    async handleRegister() {
+    async handleUpdate() {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/user", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const response = await fetch(`http://127.0.0.1:8000/api/user/`, {
+          method: "PUT",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+          },
           body: JSON.stringify({
             username: this.username,
-            email: this.email,
-            password: this.password,
-            password_confirmation: this.password_confirmation,
+            password: this.password || undefined,
+            password_confirmation: this.password_confirmation || undefined,
             hero_id: this.hero_id,
-            role: this.role
           })
         });
 
         if (!response.ok) {
           const errorData = await response.json();
           if (errorData.message === "Validation Exception" && errorData.errors) {
-              const firstError = Object.values(errorData.errors)[0][0];
-              this.errorMessage = firstError;
+            const firstError = Object.values(errorData.errors)[0][0];
+            this.errorMessage = firstError;
           } else {
-              this.errorMessage = errorData.message || "Erro ao cadastrar.";
+            this.errorMessage = errorData.message || "Erro ao atualizar.";
           }
           return;
         }
 
-        this.successMessage = "Usuário cadastrado com sucesso!";
+        this.successMessage = "Usuário atualizado com sucesso!";
         this.errorMessage = "";
       } catch (error) {
         this.errorMessage = "Erro de conexão com o servidor.";
       }
     },
-    goToLogin() {
-      this.$router.push("/login");
+    goToHome() {
+      this.$router.push("/home");
     }
   }
 };

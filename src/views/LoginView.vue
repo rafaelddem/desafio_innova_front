@@ -54,8 +54,10 @@ export default {
 
         const data = await response.json();
 
-        const token = data.token;
-        localStorage.setItem("authToken", token);
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("user.id", data.user.id);
+        localStorage.setItem("user.username", data.user.username);
+        localStorage.setItem("user.role", data.user.role);
 
         this.$router.push("/home");
       } catch (error) {
