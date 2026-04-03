@@ -1,6 +1,6 @@
 <template>
-  <div class="login-page">
-    <div class="login-container">
+  <div class="user-edit-page">
+    <div class="user-edit-container">
       <h1>Editar Usuário</h1>
       <form @submit.prevent="handleUpdate">
         <div>
@@ -145,7 +145,7 @@ export default {
 </script>
 
 <style scoped>
-.login-page {
+.user-edit-page {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -153,7 +153,7 @@ export default {
   background-color: #f5f5f5;
 }
 
-.login-container {
+.user-edit-container {
   width: 400px;
   margin: 50px auto;
   padding: 20px;
@@ -163,32 +163,32 @@ export default {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.login-container form div {
+.user-edit-container form div {
   margin-bottom: 15px;
   display: flex;
   flex-direction: column;
 }
 
-.login-container label {
+.user-edit-container label {
   margin-bottom: 5px;
   font-weight: bold;
 }
 
-.login-container input {
+.user-edit-container input {
   height: 15px;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
 
-.login-container select {
+.user-edit-container select {
   height: 40px;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
 
-.login-container button {
+.user-edit-container button {
   width: 100%;
   padding: 10px;
 }
