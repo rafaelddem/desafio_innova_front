@@ -3,6 +3,8 @@ import LoginView from '../views/LoginView.vue'
 import HomeView from '../views/HomeView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import EditUserView from '@/views/EditUserView.vue'
+import ProjectListView from '@/views/ProjectListView.vue'
+import ProjectDetailsView from '@/views/ProjectDetailsView.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const routes = [
@@ -10,7 +12,9 @@ const routes = [
   { path: '/login', name: 'Login', component: LoginView },
   { path: '/cadastrar', name: 'Register', component: RegisterView },
   { path: '/home', name: 'Home', component: HomeView, meta: { requiresAuth: true } },
-  { path: '/editar', name: 'Edit', component: EditUserView, meta: { requiresAuth: true } }
+  { path: '/editar', name: 'Edit', component: EditUserView, meta: { requiresAuth: true } },
+  { path: '/projetos', name: 'Project', component: ProjectListView, meta: { requiresAuth: true } },
+  { path: '/projetos/:id', name: 'ProjectDetails', component: ProjectDetailsView, meta: { requiresAuth: true } }
 ]
 
 const router = createRouter({
