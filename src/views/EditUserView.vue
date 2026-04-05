@@ -39,8 +39,6 @@
         <button type="submit">Editar</button>
       </form>
 
-      <button @click="goToHome" class="register-btn">Home</button>
-
       <p v-if="successMessage" style="color:green; margin-top:10px;">
         {{ successMessage }}
       </p>
@@ -136,9 +134,6 @@ export default {
       } catch (error) {
         this.errorMessage = "Erro de conexão com o servidor.";
       }
-    },
-    goToHome() {
-      this.$router.push("/home");
     }
   }
 };

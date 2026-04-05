@@ -51,7 +51,7 @@ onMounted(async () => {
       }
     })
     const data = await response.json()
-    projects.value = data.projects
+    projects.value = Array.isArray(data.projects) ? data.projects : []
   } catch (error) {
     console.error('Erro ao carregar projetos:', error)
   }
