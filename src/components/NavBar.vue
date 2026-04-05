@@ -3,7 +3,8 @@
     <ul>
       <li><router-link to="/home">Home</router-link></li>
       <li><router-link to="/editar">Edição de Usuário</router-link></li>
-      <li><router-link to="/projetos">Projetos</router-link></li>
+      <li v-if="auth.isAdmin"><router-link to="/projeto">Cadastro de Projeto</router-link></li>
+      <li><router-link to="/projetos">Lista de Projetos</router-link></li>
       <li>
         <a href="#" @click.prevent="handleLogout">Logout</a>
       </li>
