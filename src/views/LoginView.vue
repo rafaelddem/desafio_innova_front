@@ -56,7 +56,7 @@ export default {
 
         const data = await response.json();
         const auth = useAuthStore()
-        auth.login(data.token, data.user.role, data.user.username, data.user.role)
+        auth.login(data.token, data.user.role, data.user.username, data.user.id)
 
         this.$router.push("/projetos");
       } catch (error) {

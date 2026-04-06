@@ -8,13 +8,14 @@
           <li><router-link to="/projetos" @click="closeSubmenu">Lista de Projetos</router-link></li>
         </ul>
       </li>
-      <li>
+      <li v-if="auth.isAdmin">
         <a href="#" @click.prevent="toggleUser">Usuários</a>
         <ul v-if="subMenuUser" class="submenu">
-          <li v-if="auth.isAdmin"><router-link to="/cadastrar" @click="closeSubmenu">Cadastro de Usuário</router-link></li>
-          <li><router-link to="/editar" @click="closeSubmenu">Edição de Usuário</router-link></li>
+          <li><router-link to="/cadastrar" @click="closeSubmenu">Cadastro de Usuário</router-link></li>
+          <li><router-link to="/usuarios" @click="closeSubmenu">Lista de Usuários</router-link></li>
         </ul>
       </li>
+      <li><router-link :to="`/usuario/${userId}`" @click="closeSubmenu">Perfil</router-link></li>
       <li><a href="#" @click.prevent="handleLogout" @click="closeSubmenu">Logout</a></li>
     </ul>
   </nav>
@@ -29,12 +30,15 @@ const auth = useAuthStore()
 const router = useRouter()
 const subMenuProject = ref(false)
 const subMenuUser = ref(false)
+const userId = ref(localStorage.getItem('user.user_id'))
 
 function toggleProjects() {
+  closeSubmenu()
   subMenuProject.value = !subMenuProject.value
 }
 
 function toggleUser() {
+  closeSubmenu()
   subMenuUser.value = !subMenuUser.value
 }
 

@@ -31,9 +31,9 @@
         <div>
           <label for="role">Função:</label>
           <select v-model="role" disabled>
-              <option disabled value="">Selecione uma função</option>
-              <option value="admin">Administrador</option>
-              <option value="user">Usuário</option>
+            <option disabled value="">Selecione uma função</option>
+            <option value="admin">Administrador</option>
+            <option value="user">Usuário</option>
           </select>
         </div>
         <button type="submit">Editar</button>
@@ -49,94 +49,101 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "EditUserView",
-  data() {
-    return {
-      id: null,
-      username: "",
-      email: "",
-      password: "",
-      password_confirmation: "",
-      hero_id: "",
-      heroes: [],
-      role: "",
-      successMessage: "",
-      errorMessage: ""
-    };
-  },
-  async mounted() {
-    try {
-      const response = await fetch("http://127.0.0.1:8000/api/heroes");
-      if (response.ok) {
-        const data = await response.json();
-        this.heroes = data.heroes;
-      }
-    } catch (error) {
-      console.error("Erro ao carregar heroes", error);
+<script setup>
+import { ref, onMounted } from "vue"
+import { useAuthStore } from '@/stores/auth'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const auth = useAuthStore()
+const id = ref(null)
+const username = ref("")
+const email = ref("")
+const password = ref("")
+const password_confirmation = ref("")
+const hero_id = ref("")
+const heroes = ref([])
+const role = ref("")
+const successMessage = ref("")
+const errorMessage = ref("")
+
+onMounted(async () => {
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/heroes")
+    if (response.ok) {
+      const data = await response.json()
+      heroes.value = data.heroes
     }
+  } catch (error) {
+    console.error("Erro ao carregar heroes", error)
+  }
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/api/user", {
+    let url = "http://127.0.0.1:8000/api/user/";
+
+    url += (route.params && route.params.id) 
+      ? `${route.params.id}`
+      : `${localStorage.getItem("user.user_id")}`;
+
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+        "Authorization": `Bearer ${auth.token}`
       }
-    });
+    })
 
     if (response.ok) {
-      const data = await response.json();
-      this.id = data.user.id;
-      this.username = data.user.username;
-      this.email = data.user.email;
-      this.hero_id = data.user.hero_id;
-      this.role = data.user.role;
+      const data = await response.json()
+      id.value = data.user.id
+      username.value = data.user.username
+      email.value = data.user.email
+      hero_id.value = data.user.hero_id
+      role.value = data.user.role
     } else {
-      console.error("Erro ao carregar usuário");
+      console.error("Erro ao carregar usuário")
     }
   } catch (error) {
-    console.error("Erro de conexão com API", error);
+    console.error("Erro de conexão com API", error)
   }
+})
 
-  },
-  methods: {
-    async handleUpdate() {
-      try {
-        const response = await fetch(`http://127.0.0.1:8000/api/user/`, {
-          method: "PUT",
-          headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${localStorage.getItem("authToken")}`
-          },
-          body: JSON.stringify({
-            username: this.username,
-            password: this.password || undefined,
-            password_confirmation: this.password_confirmation || undefined,
-            hero_id: this.hero_id,
-          })
-        });
+async function handleUpdate() {
+  try {
+    const response = await fetch(`http://127.0.0.1:8000/api/user/`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${auth.token}`
+      },
+      body: JSON.stringify({
+        username: username.value,
+        password: password.value || undefined,
+        password_confirmation: password_confirmation.value || undefined,
+        hero_id: hero_id.value,
+      })
+    })
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          if (errorData.message === "Validation Exception" && errorData.errors) {
-            const firstError = Object.values(errorData.errors)[0][0];
-            this.errorMessage = firstError;
-          } else {
-            this.errorMessage = errorData.message || "Erro ao atualizar.";
-          }
-          return;
-        }
-
-        this.successMessage = "Usuário atualizado com sucesso!";
-        this.errorMessage = "";
-      } catch (error) {
-        this.errorMessage = "Erro de conexão com o servidor.";
+    if (!response.ok) {
+      const errorData = await response.json()
+      if (errorData.message === "Validation Exception" && errorData.errors) {
+        const firstError = Object.values(errorData.errors)[0][0]
+        errorMessage.value = firstError
+      } else {
+        errorMessage.value = errorData.message || "Erro ao atualizar."
       }
+      return
     }
+
+    successMessage.value = "Usuário atualizado com sucesso!"
+    errorMessage.value = ""
+
+    password.value = ""
+    password_confirmation.value = ""
+  } catch (error) {
+    errorMessage.value = "Erro de conexão com o servidor."
   }
-};
+}
 </script>
 
 <style scoped>

@@ -1,6 +1,6 @@
 <template>
   <div class="project-container">
-    <h1 v-if="auth.isAdmin">Listagem de Projetos</h1>
+    <h1 v-if="auth.isAdmin">Lista de Projetos</h1>
     <h1 v-else>Meus Projetos</h1>
 
     <table class="project-table" v-if="projects.length">
@@ -18,7 +18,7 @@
           <td>{{ project.name }}</td>
           <td>{{ statusMap[project.status] || project.status }}</td>
           <td>
-            <router-link :to="`/projetos/${project.id}`">
+            <router-link :to="`/projeto/${project.id}`">
               <button><i class="fa-solid fa-search"></i></button>
             </router-link>
           </td>

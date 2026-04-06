@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <NavBar v-if="auth.isAuthenticated" />
-    <router-view />
+    <router-view :key="$route.fullPath" />
   </div>
 </template>
 
