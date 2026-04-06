@@ -110,7 +110,14 @@ onMounted(async () => {
 
 async function handleUpdate() {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/user/`, {
+    let url = "http://127.0.0.1:8000/api/user/";
+
+    url += (route.params && route.params.id) 
+      ? `${route.params.id}`
+      : `${localStorage.getItem("user.user_id")}`;
+
+    console.log(url);
+    const response = await fetch(url, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
