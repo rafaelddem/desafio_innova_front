@@ -5,7 +5,7 @@
       <form @submit.prevent="handleEdit">
         <div>
           <label for="name">Nome:</label>
-          <input type="text" v-model="project.name" required />
+          <input type="text" v-model="project.name" :required="auth.role == 'admin'" :disabled="auth.role == 'user'" />
         </div>
         <div>
           <label for="description">Descrição:</label>
@@ -14,6 +14,8 @@
             v-model="project.description" 
             rows="5" 
             cols="40"
+            :required="auth.role == 'admin'"
+            :disabled="auth.role == 'user'"
             placeholder="Descreva a atividade a ser executada...">
           </textarea>
         </div>
@@ -38,12 +40,13 @@
         </div>
         <div>
           <label for="user_id">Personagem:</label>
-          <select v-model="project.user_id" required>
+          <select v-if="auth.role == 'admin'" v-model="project.user_id">
             <option disabled value="">Selecione um personagem</option>
             <option v-for="user in users" :key="user.id" :value="user.id">
               {{ user.hero_name }}
             </option>
           </select>
+          <input v-else type="text" :value="project.hero_name" disabled/>
         </div>
         <button type="submit">Editar</button>
       </form>
@@ -100,19 +103,23 @@ onMounted(async () => {
 
 async function handleEdit() {
   try {
+    let formData = auth.role == 'admin'
+      ? project.value
+      : { goals: project.value.goals, status: project.value.status };
+
     const response = await fetch(`http://127.0.0.1:8000/api/project/${route.params.id}`, {
       method: 'PUT',
       headers: {
         Authorization: `Bearer ${auth.token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(project.value)
+      body: JSON.stringify(formData)
     })
 
     if (response.ok) {
       router.push('/projetos')
     } else {
-      console.error('Erro ao salvar projeto')
+      console.error('Erro ao editar projeto')
     }
   } catch (error) {
     console.error('Erro de conexão:', error)
