@@ -1,18 +1,21 @@
 <template>
   <nav class="navbar">
     <ul>
-      <li><router-link to="/home" @click="closeSubmenu">Home</router-link></li>
-      <li><router-link to="/editar" @click="closeSubmenu">Edição de Usuário</router-link></li>
       <li>
-        <a href="#" @click.prevent="toggleProjetos">Projetos</a>
+        <a href="#" @click.prevent="toggleProjects">Projetos</a>
         <ul v-if="subMenuProject" class="submenu">
           <li v-if="auth.isAdmin"><router-link to="/projeto" @click="closeSubmenu">Cadastro de Projeto</router-link></li>
           <li><router-link to="/projetos" @click="closeSubmenu">Lista de Projetos</router-link></li>
         </ul>
       </li>
       <li>
-        <a href="#" @click.prevent="handleLogout" @click="closeSubmenu">Logout</a>
+        <a href="#" @click.prevent="toggleUser">Usuários</a>
+        <ul v-if="subMenuUser" class="submenu">
+          <li v-if="auth.isAdmin"><router-link to="/cadastrar" @click="closeSubmenu">Cadastro de Usuário</router-link></li>
+          <li><router-link to="/editar" @click="closeSubmenu">Edição de Usuário</router-link></li>
+        </ul>
       </li>
+      <li><a href="#" @click.prevent="handleLogout" @click="closeSubmenu">Logout</a></li>
     </ul>
   </nav>
 </template>
@@ -25,13 +28,19 @@ import { ref } from 'vue'
 const auth = useAuthStore()
 const router = useRouter()
 const subMenuProject = ref(false)
+const subMenuUser = ref(false)
 
-function toggleProjetos() {
+function toggleProjects() {
   subMenuProject.value = !subMenuProject.value
+}
+
+function toggleUser() {
+  subMenuUser.value = !subMenuUser.value
 }
 
 function closeSubmenu() {
   subMenuProject.value = false
+  subMenuUser.value = false
 }
 
 async function handleLogout() {
@@ -82,7 +91,7 @@ async function handleLogout() {
 }
 
 .navbar a:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .navbar .submenu {

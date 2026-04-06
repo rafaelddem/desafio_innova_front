@@ -39,7 +39,7 @@
         <button type="submit">Cadastrar</button>
       </form>
 
-      <button @click="goToLogin" class="register-btn">Login</button>
+      <button v-if="auth.token == null" @click="goToLogin" class="register-btn">Login</button>
 
       <p v-if="successMessage" style="color:green; margin-top:10px;">
         {{ successMessage }}
@@ -51,73 +51,79 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "RegisterView",
-  data() {
-    return {
-      username: "",
-      email: "",
-      password: "",
-      password_confirmation: "",
-      hero_id: "",
-      heroes: [],
-      role: "",
-      successMessage: "",
-      errorMessage: ""
-    };
-  },
-  async mounted() {
-    try {
-      const response = await fetch("http://127.0.0.1:8000/api/heroes");
-      if (response.ok) {
-        const data = await response.json();
-        this.heroes = data.heroes;
-      } else {
-        console.error("Erro ao carregar os Heróis");
-      }
-    } catch (error) {
-      console.error("Erro de conexão com API", error);
-    }
-  },
-  methods: {
-    async handleRegister() {
-      try {
-        const response = await fetch("http://127.0.0.1:8000/api/user", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            username: this.username,
-            email: this.email,
-            password: this.password,
-            password_confirmation: this.password_confirmation,
-            hero_id: this.hero_id,
-            role: this.role
-          })
-        });
+<script setup>
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from '@/stores/auth'
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          if (errorData.message === "Validation Exception" && errorData.errors) {
-              const firstError = Object.values(errorData.errors)[0][0];
-              this.errorMessage = firstError;
-          } else {
-              this.errorMessage = errorData.message || "Erro ao cadastrar.";
-          }
-          return;
-        }
+const router = useRouter();
+const auth = useAuthStore();
 
-        this.successMessage = "Usuário cadastrado com sucesso!";
-        this.errorMessage = "";
-      } catch (error) {
-        this.errorMessage = "Erro de conexão com o servidor.";
-      }
-    },
-    goToLogin() {
-      this.$router.push("/login");
+const username = ref("");
+const email = ref("");
+const password = ref("");
+const password_confirmation = ref("");
+const hero_id = ref("");
+const heroes = ref([]);
+const role = ref("");
+const successMessage = ref("");
+const errorMessage = ref("");
+
+onMounted(async () => {
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/heroes");
+    if (response.ok) {
+      const data = await response.json();
+      heroes.value = data.heroes;
+    } else {
+      console.error("Erro ao carregar os Heróis");
     }
+  } catch (error) {
+    console.error("Erro de conexão com API", error);
   }
-};
+});
+
+async function handleRegister() {
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/user", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: username.value,
+        email: email.value,
+        password: password.value,
+        password_confirmation: password_confirmation.value,
+        hero_id: hero_id.value,
+        role: role.value,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      if (errorData.message === "Validation Exception" && errorData.errors) {
+        const firstError = Object.values(errorData.errors)[0][0];
+        errorMessage.value = firstError;
+      } else {
+        errorMessage.value = errorData.message || "Erro ao cadastrar.";
+      }
+      return;
+    }
+
+    successMessage.value = "Usuário cadastrado com sucesso!";
+    errorMessage.value = "";username.value = "";
+    email.value = "";
+    password.value = "";
+    password_confirmation.value = "";
+    hero_id.value = "";
+    role.value = "";
+  } catch (error) {
+    errorMessage.value = "Erro de conexão com o servidor.";
+  }
+}
+
+function goToLogin() {
+  router.push("/login");
+}
 </script>
 
 <style scoped>

@@ -58,7 +58,7 @@ export default {
         const auth = useAuthStore()
         auth.login(data.token, data.user.role, data.user.username, data.user.role)
 
-        this.$router.push("/home");
+        this.$router.push("/projetos");
       } catch (error) {
         this.errorMessage = "Erro de conexão com o servidor.";
         console.error(error);
