@@ -19,7 +19,7 @@
           <td>{{ statusMap[project.status] || project.status }}</td>
           <td>
             <router-link :to="`/projetos/${project.id}`">
-              <button>Ver detalhes</button>
+              <button><i class="fa-solid fa-search"></i></button>
             </router-link>
           </td>
         </tr>
