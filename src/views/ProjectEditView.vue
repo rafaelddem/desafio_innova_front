@@ -73,20 +73,22 @@ const project = ref({
 const users = ref([])
 
 onMounted(async () => {
-  try {
-    const response = await fetch("http://127.0.0.1:8000/api/user/list", {
-      headers: {
-        Authorization: `Bearer ${auth.token}`
+  if (auth.role == 'admin') {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/user/list", {
+        headers: {
+          Authorization: `Bearer ${auth.token}`
+        }
+      })
+      if (response.ok) {
+        const data = await response.json();
+        users.value = data.users;
+      } else {
+        console.error("Erro ao carregar os Heróis");
       }
-    })
-    if (response.ok) {
-      const data = await response.json();
-      users.value = data.users;
-    } else {
-      console.error("Erro ao carregar os Heróis");
+    } catch (error) {
+      console.error("Erro de conexão com API", error);
     }
-  } catch (error) {
-    console.error("Erro de conexão com API", error);
   }
   try {
     const response = await fetch(`http://127.0.0.1:8000/api/project/${route.params.id}`, {
