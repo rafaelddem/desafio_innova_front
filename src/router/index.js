@@ -5,7 +5,7 @@ import RegisterView from '@/views/RegisterView.vue'
 import EditUserView from '@/views/EditUserView.vue'
 import ProjectCreateView from '@/views/ProjectCreateView.vue'
 import ProjectListView from '@/views/ProjectListView.vue'
-import ProjectDetailsView from '@/views/ProjectDetailsView.vue'
+import ProjectEditView from '@/views/ProjectEditView.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const routes = [
@@ -16,7 +16,7 @@ const routes = [
   { path: '/editar', name: 'Edit', component: EditUserView, meta: { requiresAuth: true } },
   { path: '/projeto', name: 'ProjectCreate', component: ProjectCreateView, meta: { requiresAuth: true } },
   { path: '/projetos', name: 'ProjectList', component: ProjectListView, meta: { requiresAuth: true } },
-  { path: '/projetos/:id', name: 'ProjectDetails', component: ProjectDetailsView, meta: { requiresAuth: true } }
+  { path: '/projetos/:id', name: 'ProjectDetails', component: ProjectEditView, meta: { requiresAuth: true } }
 ]
 
 const router = createRouter({
